@@ -154,7 +154,7 @@ class StatsForecast extends Module
 						<th></th>
 						<th class="center"><span class="title_box active">'.$this->l('Visits').'</span></th>
 						<th class="center"><span class="title_box active">'.$this->l('Registrations').'</span></th>
-						<th class="center"><span class="title_box active">'.$this->l('orders').'</span></th>
+						<th class="center"><span class="title_box active">'.$this->l('Orders').'</span></th>
 						<th class="center"><span class="title_box active">'.$this->l('Items').'</span></th>
 						<th class="center"><span class="title_box active">'.$this->l('% Registrations').'</span></th>
 						<th class="center"><span class="title_box active">'.$this->l('% Orders').'</span></th>
@@ -209,7 +209,7 @@ class StatsForecast extends Module
 					<th></th>
 					<th class="center"><span class="title_box active">'.$this->l('Visits').'</span></th>
 					<th class="center"><span class="title_box active">'.$this->l('Registrations').'</span></th>
-					<th class="center"><span class="title_box active">'.$this->l('orders').'</span></th>
+					<th class="center"><span class="title_box active">'.$this->l('Orders').'</span></th>
 					<th class="center"><span class="title_box active">'.$this->l('Items').'</span></th>
 					<th class="center"><span class="title_box active">'.$this->l('% Registrations').'</span></th>
 					<th class="center"><span class="title_box active">'.$this->l('% Orders').'</span></th>
