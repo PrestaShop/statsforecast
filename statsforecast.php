@@ -154,11 +154,11 @@ class StatsForecast extends Module
 						<th></th>
 						<th class="center"><span class="title_box active">'.$this->l('Visits').'</span></th>
 						<th class="center"><span class="title_box active">'.$this->l('Registrations').'</span></th>
-						<th class="center"><span class="title_box active">'.$this->l('Orders').'</span></th>
-						<th class="center"><span class="title_box active">'.$this->l('Items').'</span></th>
-						<th class="center"><span class="title_box active">'.$this->l('% Registrations').'</span></th>
-						<th class="center"><span class="title_box active">'.$this->l('% Orders').'</span></th>
-						<th class="center"><span class="title_box active">'.$this->l('Sales').'</span></th>
+						<th class="center"><span class="title_box active">'.$this->l('Passed orders').'</span></th>
+						<th class="center"><span class="title_box active">'.$this->l('Bought items').'</span></th>
+						<th class="center"><span class="title_box active">'.$this->l('% of registrations').'</span></th>
+						<th class="center"><span class="title_box active">'.$this->l('% of orders').'</span></th>
+						<th class="center"><span class="title_box active">'.$this->l('Revenue').'</span></th>
 					</tr>
 				</thead>';
 
@@ -209,11 +209,11 @@ class StatsForecast extends Module
 					<th></th>
 					<th class="center"><span class="title_box active">'.$this->l('Visits').'</span></th>
 					<th class="center"><span class="title_box active">'.$this->l('Registrations').'</span></th>
-					<th class="center"><span class="title_box active">'.$this->l('Orders').'</span></th>
-					<th class="center"><span class="title_box active">'.$this->l('Items').'</span></th>
-					<th class="center"><span class="title_box active">'.$this->l('% Registrations').'</span></th>
-					<th class="center"><span class="title_box active">'.$this->l('% Orders').'</span></th>
-					<th class="center"><span class="title_box active">'.$this->l('Sales').'</span></th>
+					<th class="center"><span class="title_box active">'.$this->l('Passed orders').'</span></th>
+					<th class="center"><span class="title_box active">'.$this->l('Bought items').'</span></th>
+					<th class="center"><span class="title_box active">'.$this->l('% of registrations').'</span></th>
+					<th class="center"><span class="title_box active">'.$this->l('% of orders').'</span></th>
+					<th class="center"><span class="title_box active">'.$this->l('Revenue').'</span></th>
 				</tr>
 				<tr>
 					<td>'.$this->l('Total').'</td>
@@ -349,7 +349,7 @@ class StatsForecast extends Module
 							<i class="icon-chevron-right"></i>
 						</td>
 						<td rowspan="2" class="center">
-							<p>'.$this->l('orders').'</p>
+							<p>'.$this->l('Orders').'</p>
 						</td>
 					</tr>
 					<tr>
@@ -408,7 +408,7 @@ class StatsForecast extends Module
 							<th class="center"><span class="title_box active">'.$this->l('Module').'</span></th>
 							<th class="center"><span class="title_box active">'.$this->l('Transactions').'</span></th>
 							<th class="center"><span class="title_box active">'.$this->l('Total').'</span></th>
-							<th class="center"><span class="title_box active">'.$this->l('Average Cart Value').'</span></th>
+							<th class="center"><span class="title_box active">'.$this->l('Average cart value').'</span></th>
 						</tr>
 					</thead>
 					<tbody>';
@@ -446,7 +446,7 @@ class StatsForecast extends Module
 					<thead>
 						<tr>
 							<th class="center"><span class="title_box active">'.$this->l('Category').'</span></th>
-							<th class="center"><span class="title_box active">'.$this->l('Products Sold').'</span></th>
+							<th class="center"><span class="title_box active">'.$this->l('Products sold').'</span></th>
 							<th class="center"><span class="title_box active">'.$this->l('Sales').'</span></th>
 							<th class="center"><span class="title_box active">'.$this->l('% Count').'</span></th>
 							<th class="center"><span class="title_box active">'.$this->l('% Sales').'</span></th>
@@ -475,7 +475,7 @@ class StatsForecast extends Module
 						<tr>
 							<th class="center"><span class="title_box active">'.$this->l('Language').'</span></th>
 							<th class="center"><span class="title_box active">'.$this->l('Sales').'</span></th>
-							<th class="center"><span class="title_box active">'.$this->l('%').'</span></th>
+							<th class="center"><span class="title_box active">'.$this->l('Percentage').'</span></th>
 							<th class="center" colspan="2"><span class="title_box active">'.$this->l('Growth').'</span></th>
 						</tr>
 					</thead>
