@@ -245,7 +245,8 @@ class StatsForecast extends Module
 					<td class="text-center">--</td>
 					<td class="text-right">'.Tools::displayPrice($this->t8 * $prop30, $currency).'</td>
 				</tr>
-			</table>';
+			</table>
+		</div>';
 
 		$ca = $this->getRealCA();
 
