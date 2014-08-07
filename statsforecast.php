@@ -300,7 +300,7 @@ class StatsForecast extends Module
 						</td>
 						<td class="text-center">
 							<p><i class="icon-chevron-right"></i></p>
-							<p>'.round(100 * $customers / max(1, $visitors)).' %</p>
+							<p>'.round(100 * $customers / max(1, $visitors), 2).' %</p>
 						</td>
 						<td class="text-center">
 							<p>'.$this->l('Accounts').'</p>
@@ -308,7 +308,7 @@ class StatsForecast extends Module
 						</td>
 						<td class="text-center">
 							<p><i class="icon-chevron-right"></i></p>
-							<p>'.round(100 * $fullcarts / max(1, $customers)).' %</p>
+							<p>'.round(100 * $fullcarts / max(1, $customers), 2).' %</p>
 						</td>
 						<td rowspan="2" class="text-center">
 							<p>'.$this->l('Full carts').'</p>
@@ -316,7 +316,7 @@ class StatsForecast extends Module
 						</td>
 						<td rowspan="2" class="text-center">
 							<p><i class="icon-chevron-right"></i></p>
-							<p>'.round(100 * $orders / max(1, $fullcarts)).' %</p>
+							<p>'.round(100 * $orders / max(1, $fullcarts), 2).' %</p>
 						</td>
 						<td rowspan="2" class="text-center">
 							<p>'.$this->l('Orders').'</p>
