@@ -418,7 +418,7 @@ class StatsForecast extends Module
 							<td class="text-center">'.$payment['payment_method'].'</td>
 							<td class="text-center">'.(int)$payment['nb'].'</td>
 							<td class="text-right">'.Tools::displayPrice($payment['total'], $currency).'</td>
-							<td class="text-right">'.Tools::displayPrice($payment['cart'], $currency).'</td>
+							<td class="text-right">'.Tools::displayPrice($payment['total'] / (int)$payment['nb'], $currency).'</td>
 						</tr>';
 		$this->html .= '
 					</tbody>
@@ -650,14 +650,18 @@ class StatsForecast extends Module
 			$ca['langprev'] = array();
 		}
 
-		$sql = 'SELECT op.payment_method, SUM(amount / o.conversion_rate) as total, COUNT(*) as nb, AVG(amount / o.conversion_rate) as cart
-				FROM `'._DB_PREFIX_.'orders` o
-				LEFT JOIN `'._DB_PREFIX_.'order_payment` op ON o.reference = op.order_reference
-				'.$join.'
-				WHERE o.valid = 1
-				AND o.`invoice_date` BETWEEN '.ModuleGraph::getDateBetween().'
-				'.$where.'
-				'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
+		$sql = 'SELECT op.payment_method, SUM(op.amount / op.conversion_rate) as total, COUNT(DISTINCT op.order_reference) as nb
+				FROM `'._DB_PREFIX_.'order_payment` op
+				WHERE op.`date_add` BETWEEN '.ModuleGraph::getDateBetween().'
+				AND op.order_reference IN (
+					SELECT reference
+					FROM `'._DB_PREFIX_.'orders` o
+					'.$join.'
+					WHERE o.valid
+					'.$where.'
+					'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
+					AND o.invoice_date BETWEEN '.ModuleGraph::getDateBetween().'
+				)
 				GROUP BY op.payment_method
 				ORDER BY total DESC';
 		$ca['payment'] = Db::getInstance()->executeS($sql);
