@@ -650,21 +650,31 @@ class StatsForecast extends Module
 			$ca['langprev'] = array();
 		}
 
-		$sql = 'SELECT op.payment_method, SUM(op.amount / op.conversion_rate) as total, COUNT(DISTINCT op.order_reference) as nb
-				FROM `'._DB_PREFIX_.'order_payment` op
-				WHERE op.`date_add` BETWEEN '.ModuleGraph::getDateBetween().'
-				AND op.order_reference IN (
-					SELECT reference
+		$sql = 'SELECT reference
 					FROM `'._DB_PREFIX_.'orders` o
 					'.$join.'
 					WHERE o.valid
 					'.$where.'
 					'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
-					AND o.invoice_date BETWEEN '.ModuleGraph::getDateBetween().'
-				)
-				GROUP BY op.payment_method
-				ORDER BY total DESC';
-		$ca['payment'] = Db::getInstance()->executeS($sql);
+					AND o.invoice_date BETWEEN '.ModuleGraph::getDateBetween().'';
+		$result = Db::getInstance()->executeS($sql);
+		if (count($result))
+		{
+			$references = array();
+			foreach ($result as $r)
+				$references[] = $r['reference'];
+			$sql = 'SELECT op.payment_method, SUM(op.amount / op.conversion_rate) as total, COUNT(DISTINCT op.order_reference) as nb
+					FROM `'._DB_PREFIX_.'order_payment` op
+					WHERE op.`date_add` BETWEEN '.ModuleGraph::getDateBetween().'
+					AND op.order_reference IN (
+						"'.implode('","', $references).'"
+					)
+					GROUP BY op.payment_method
+					ORDER BY total DESC';
+			$ca['payment'] = Db::getInstance()->executeS($sql);
+		}
+		else
+			$ca['payment'] = array();
 
 		$sql = 'SELECT z.name, SUM(o.total_paid_tax_excl / o.conversion_rate) as total, COUNT(*) as nb
 				FROM `'._DB_PREFIX_.'orders` o
