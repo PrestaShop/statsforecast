@@ -43,7 +43,7 @@ class StatsForecast extends Module
 	{
 		$this->name = 'statsforecast';
 		$this->tab = 'analytics_stats';
-		$this->version = '1.3.4';
+		$this->version = '1.3.5';
 		$this->author = 'PrestaShop';
 		$this->need_instance = 0;
 
