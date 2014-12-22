@@ -163,14 +163,42 @@ class StatsForecast extends Module
 				</thead>';
 
 		$visit_array = array();
-		$sql = 'SELECT '.$date_from_gadd.' as fix_date, COUNT(*) as visits
+		$gapi = Module::isInstalled('gapi') ? Module::getInstanceByName('gapi') : false;
+		if (Validate::isLoadedObject($gapi) && $gapi->isConfigured())
+		{
+			$visits = AdminStatsControllerCore::getVisits(false, $employee->stats_date_from, $employee->stats_date_to, 'day');
+			foreach ($visits as $k=>$v) 
+			{
+				switch ($this->context->cookie->stats_granularity) 
+				{
+					case 10: //daily
+						$idx = date("Y-m-d", $k);
+						break;
+					case 42: //weekly
+						$idx = date("Y-m-d", strtotime(sprintf("%s-W%02s-1",date("o", $k),date('W', $k))));
+						break;
+					case 7: //monthly
+						$idx = date("Y-m", $k);
+						break;
+					case 4: //yearly  
+						$idx = date("Y", $k);
+						break;
+				}
+				if (!isset($visit_array[$idx])) $visit_array[$idx] = 0;
+				$visit_array[$idx] += $v;
+			}
+		} 
+		else 
+		{
+			$sql = 'SELECT '.$date_from_gadd.' as fix_date, COUNT(*) as visits
 				FROM '._DB_PREFIX_.'connections c
 				WHERE c.date_add BETWEEN '.ModuleGraph::getDateBetween().'
 				'.Shop::addSqlRestriction(false, 'c').'
 				GROUP BY '.$date_from_gadd;
-		$visits = Db::getInstance()->query($sql);
-		while ($row = $db->nextRow($visits))
-			$visit_array[$row['fix_date']] = $row['visits'];
+			$visits = Db::getInstance()->query($sql);
+			while ($row = $db->nextRow($visits))
+				$visit_array[$row['fix_date']] = $row['visits'];
+		}
 
 		foreach ($data_table as $row)
 		{
