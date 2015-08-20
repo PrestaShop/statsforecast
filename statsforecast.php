@@ -30,6 +30,7 @@ if (!defined('_PS_VERSION_'))
 class StatsForecast extends Module
 {
 	private $html = '';
+	private $employeeFilters;
 	private $t1 = 0;
 	private $t2 = 0;
 	private $t3 = 0;
@@ -52,6 +53,11 @@ class StatsForecast extends Module
 		$this->displayName = $this->l('Stats Dashboard');
 		$this->description = $this->l('This is the main module for the Stats dashboard. It displays a summary of all your current statistics.');
 		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+
+		$this->employeeFilters = $this->context->cookie;
+        if (version_compare(_PS_VERSION_, '1.7.0', '>=')) {
+            $this->employeeFilters = $this->context->employee->filters;
+        }
 	}
 
 	public function install()
@@ -70,12 +76,12 @@ class StatsForecast extends Module
 
 		$db = Db::getInstance();
 
-		if (!isset($this->context->cookie->stats_granularity))
-			$this->context->cookie->stats_granularity = 10;
+		if (!isset($this->employeeFilters->stats_granularity))
+			$this->employeeFilters->stats_granularity = 10;
 		if (Tools::isSubmit('submitIdZone'))
-			$this->context->cookie->stats_id_zone = (int)Tools::getValue('stats_id_zone');
+			$this->employeeFilters->stats_id_zone = (int)Tools::getValue('stats_id_zone');
 		if (Tools::isSubmit('submitGranularity'))
-			$this->context->cookie->stats_granularity = Tools::getValue('stats_granularity');
+			$this->employeeFilters->stats_granularity = Tools::getValue('stats_granularity');
 
 		$currency = $this->context->currency;
 		$employee = $this->context->employee;
@@ -87,17 +93,17 @@ class StatsForecast extends Module
 		$interval2 = ($to2 - $from) / 60 / 60 / 24;
 		$prop30 = $interval / $interval2;
 
-		if ($this->context->cookie->stats_granularity == 7)
+		if ($this->employeeFilters->stats_granularity == 7)
 			$interval_avg = $interval2 / 30;
-		if ($this->context->cookie->stats_granularity == 4)
+		if ($this->employeeFilters->stats_granularity == 4)
 			$interval_avg = $interval2 / 365;
-		if ($this->context->cookie->stats_granularity == 10)
+		if ($this->employeeFilters->stats_granularity == 10)
 			$interval_avg = $interval2;
-		if ($this->context->cookie->stats_granularity == 42)
+		if ($this->employeeFilters->stats_granularity == 42)
 			$interval_avg = $interval2 / 7;
 
 		$data_table = array();
-		if ($this->context->cookie->stats_granularity == 10)
+		if ($this->employeeFilters->stats_granularity == 10)
 			for ($i = $from; $i <= $to2; $i = strtotime('+1 day', $i))
 				$data_table[date('Y-m-d', $i)] = array(
 					'fix_date' => date('Y-m-d', $i),
@@ -106,12 +112,12 @@ class StatsForecast extends Module
 					'totalSales' => 0
 				);
 
-		$date_from_gadd = ($this->context->cookie->stats_granularity != 42
-			? 'LEFT(date_add, '.(int)$this->context->cookie->stats_granularity.')'
+		$date_from_gadd = ($this->employeeFilters->stats_granularity != 42
+			? 'LEFT(date_add, '.(int)$this->employeeFilters->stats_granularity.')'
 			: 'IFNULL(MAKEDATE(YEAR(date_add),DAYOFYEAR(date_add)-WEEKDAY(date_add)), CONCAT(YEAR(date_add),"-01-01*"))');
 
-		$date_from_ginvoice = ($this->context->cookie->stats_granularity != 42
-			? 'LEFT(invoice_date, '.(int)$this->context->cookie->stats_granularity.')'
+		$date_from_ginvoice = ($this->employeeFilters->stats_granularity != 42
+			? 'LEFT(invoice_date, '.(int)$this->employeeFilters->stats_granularity.')'
 			: 'IFNULL(MAKEDATE(YEAR(invoice_date),DAYOFYEAR(invoice_date)-WEEKDAY(invoice_date)), CONCAT(YEAR(invoice_date),"-01-01*"))');
 
 		$result = $db->query('
@@ -140,9 +146,9 @@ class StatsForecast extends Module
 						<input type="hidden" name="submitGranularity" value="1" />
 						<select name="stats_granularity" onchange="this.form.submit();">
 							<option value="10">'.$this->l('Daily').'</option>
-							<option value="42" '.($this->context->cookie->stats_granularity == '42' ? 'selected="selected"' : '').'>'.$this->l('Weekly').'</option>
-							<option value="7" '.($this->context->cookie->stats_granularity == '7' ? 'selected="selected"' : '').'>'.$this->l('Monthly').'</option>
-							<option value="4" '.($this->context->cookie->stats_granularity == '4' ? 'selected="selected"' : '').'>'.$this->l('Yearly').'</option>
+							<option value="42" '.($this->employeeFilters->stats_granularity == '42' ? 'selected="selected"' : '').'>'.$this->l('Weekly').'</option>
+							<option value="7" '.($this->employeeFilters->stats_granularity == '7' ? 'selected="selected"' : '').'>'.$this->l('Monthly').'</option>
+							<option value="4" '.($this->employeeFilters->stats_granularity == '4' ? 'selected="selected"' : '').'>'.$this->l('Yearly').'</option>
 						</select>
 					</div>
 				</div>
@@ -176,7 +182,7 @@ class StatsForecast extends Module
 		{
 			$visits_today = (int)(isset($visit_array[$row['fix_date']]) ? $visit_array[$row['fix_date']] : 0);
 
-			$date_from_greg = ($this->context->cookie->stats_granularity != 42
+			$date_from_greg = ($this->employeeFilters->stats_granularity != 42
 				? 'LIKE \''.$row['fix_date'].'%\''
 				: 'BETWEEN \''.Tools::substr($row['fix_date'], 0, 10).' 00:00:00\' AND DATE_ADD(\''.Tools::substr($row['fix_date'], 0, 8).Tools::substr($row['fix_date'], 8, 2).' 23:59:59\', INTERVAL 7 DAY)');
 			$row['registrations'] = Db::getInstance()->getValue('
@@ -396,7 +402,7 @@ class StatsForecast extends Module
 							<select name="stats_id_zone" onchange="this.form.submit();">
 								<option value="0">'.$this->l('-- No filter --').'</option>';
 		foreach (Zone::getZones() as $zone)
-			$this->html .= '<option value="'.(int)$zone['id_zone'].'" '.($this->context->cookie->stats_id_zone == $zone['id_zone'] ? 'selected="selected"' : '').'>'.$zone['name'].'</option>';
+			$this->html .= '<option value="'.(int)$zone['id_zone'].'" '.($this->employeeFilters->stats_id_zone == $zone['id_zone'] ? 'selected="selected"' : '').'>'.$zone['name'].'</option>';
 		$this->html .= '
 							</select>
 						</div>
@@ -436,7 +442,7 @@ class StatsForecast extends Module
 							<select name="stats_id_zone" onchange="this.form.submit();">
 								<option value="0">'.$this->l('-- No filter --').'</option>';
 		foreach (Zone::getZones() as $zone)
-			$this->html .= '<option value="'.(int)$zone['id_zone'].'" '.($this->context->cookie->stats_id_zone == $zone['id_zone'] ? 'selected="selected"' : '').'>'.$zone['name'].'</option>';
+			$this->html .= '<option value="'.(int)$zone['id_zone'].'" '.($this->employeeFilters->stats_id_zone == $zone['id_zone'] ? 'selected="selected"' : '').'>'.$zone['name'].'</option>';
 		$this->html .= '
 							</select>
 						</div>
@@ -534,7 +540,7 @@ class StatsForecast extends Module
 							<select name="stats_id_zone" onchange="this.form.submit();">
 								<option value="0">'.$this->l('-- No filter --').'</option>';
 		foreach (Zone::getZones() as $zone)
-			$this->html .= '<option value="'.(int)$zone['id_zone'].'" '.($this->context->cookie->stats_id_zone == $zone['id_zone'] ? 'selected="selected"' : '').'>'.$zone['name'].'</option>';
+			$this->html .= '<option value="'.(int)$zone['id_zone'].'" '.($this->employeeFilters->stats_id_zone == $zone['id_zone'] ? 'selected="selected"' : '').'>'.$zone['name'].'</option>';
 		$this->html .= '
 							</select>
 						</div>
@@ -596,10 +602,10 @@ class StatsForecast extends Module
 		$ca = array();
 
 		$where = $join = '';
-		if ((int)$this->context->cookie->stats_id_zone)
+		if ((int)$this->employeeFilters->stats_id_zone)
 		{
 			$join = ' LEFT JOIN `'._DB_PREFIX_.'address` a ON o.id_address_invoice = a.id_address LEFT JOIN `'._DB_PREFIX_.'country` co ON co.id_country = a.id_country';
-			$where = ' AND co.id_zone = '.(int)$this->context->cookie->stats_id_zone.' ';
+			$where = ' AND co.id_zone = '.(int)$this->employeeFilters->stats_id_zone.' ';
 		}
 
 		$sql = 'SELECT SUM(od.`product_price` * od.`product_quantity` / o.conversion_rate) as orderSum, SUM(od.product_quantity) as orderQty, cl.name, AVG(od.`product_price` / o.conversion_rate) as priveAvg
