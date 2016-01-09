@@ -169,8 +169,15 @@ class StatsForecast extends Module
 				'.Shop::addSqlRestriction(false, 'c').'
 				GROUP BY '.$date_from_gadd;
 		$visits = Db::getInstance()->query($sql);
-		while ($row = $db->nextRow($visits))
-			$visit_array[$row['fix_date']] = $row['visits'];
+		while ($row = $db->nextRow($visits)) {
+            		$visit_array[$row['fix_date']] = $row['visits'];
+
+            		if (!isset($data_table[$row['fix_date']])) {
+                		$data_table[$row['fix_date']] = $row;
+            		}
+        	}
+
+        	krsort($data_table);
 
 		foreach ($data_table as $row)
 		{
