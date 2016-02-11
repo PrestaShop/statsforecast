@@ -110,21 +110,17 @@ class StatsForecast extends Module
 			? 'LEFT(date_add, '.(int)$this->context->cookie->stats_granularity.')'
 			: 'IFNULL(MAKEDATE(YEAR(date_add),DAYOFYEAR(date_add)-WEEKDAY(date_add)), CONCAT(YEAR(date_add),"-01-01*"))');
 
-		$date_from_ginvoice = ($this->context->cookie->stats_granularity != 42
-			? 'LEFT(invoice_date, '.(int)$this->context->cookie->stats_granularity.')'
-			: 'IFNULL(MAKEDATE(YEAR(invoice_date),DAYOFYEAR(invoice_date)-WEEKDAY(invoice_date)), CONCAT(YEAR(invoice_date),"-01-01*"))');
-
 		$result = $db->query('
 		SELECT
-			'.$date_from_ginvoice.' as fix_date,
+			'.$date_from_gadd.' as fix_date,
 			COUNT(*) as countOrders,
 			SUM((SELECT SUM(od.product_quantity) FROM '._DB_PREFIX_.'order_detail od WHERE o.id_order = od.id_order)) as countProducts,
 			SUM(o.total_paid_tax_excl / o.conversion_rate) as totalSales
 		FROM '._DB_PREFIX_.'orders o
 		WHERE o.valid = 1
-		AND o.invoice_date BETWEEN '.ModuleGraph::getDateBetween().'
+		AND o.date_add BETWEEN '.ModuleGraph::getDateBetween().'
 		'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o').'
-		GROUP BY '.$date_from_ginvoice);
+		GROUP BY '.$date_from_gadd);
 		while ($row = $db->nextRow($result))
 			$data_table[$row['fix_date']] = $row;
 
