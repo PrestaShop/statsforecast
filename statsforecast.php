@@ -163,14 +163,39 @@ class StatsForecast extends Module
 				</thead>';
 
 		$visit_array = array();
-		$sql = 'SELECT '.$date_from_gadd.' as fix_date, COUNT(*) as visits
-				FROM '._DB_PREFIX_.'connections c
-				WHERE c.date_add BETWEEN '.ModuleGraph::getDateBetween().'
-				'.Shop::addSqlRestriction(false, 'c').'
-				GROUP BY '.$date_from_gadd;
-		$visits = Db::getInstance()->query($sql);
-		while ($row = $db->nextRow($visits))
-			$visit_array[$row['fix_date']] = $row['visits'];
+		$gapi = Module::isInstalled('gapi') ? Module::getInstanceByName('gapi') : false;
+		if (Validate::isLoadedObject($gapi) && $gapi->isConfigured())
+		{
+			$metric = 'visits';
+			if ($result = $gapi->requestReportData($this->context->cookie->stats_granularity ? 'ga:date' : '', 'ga:'.$metric, $employee->stats_date_from, $employee->stats_date_to, null, null, 1, 5000))
+				foreach ($result as $row)
+					if ($this->context->cookie->stats_granularity == 10)
+						$index = preg_replace('/^([0-9]{4})([0-9]{2})([0-9]{2})$/', '$1-$2-$3', $row['dimensions']['date']);
+					elseif ($this->context->cookie->stats_granularity == 42)
+					{
+						$day = preg_replace('/^([0-9]{4})([0-9]{2})([0-9]{2})$/', '$1-$2-$3', strtotime($row['dimensions']['date']));
+						$index = date('Y-m-d', strtotime(sprintf("%s-W%02s-1", date('o', $day), date('W', $day))));
+					}
+					elseif ($this->context->cookie->stats_granularity == 7)
+						$index = preg_replace('/^([0-9]{4})([0-9]{2})([0-9]{2})$/', '$1-$2', $row['dimensions']['date']);
+					elseif ($this->context->cookie->stats_granularity == 4)
+						$index = preg_replace('/^([0-9]{4})([0-9]{2})([0-9]{2})$/', '$1', $row['dimensions']['date']);
+
+					if (!isset($visit_array[$index]))
+						$visit_array[$index] = 0;
+					$visit_array[$index] += (int)$row['metrics'][$metric];
+		}
+		else
+		{
+			$sql = 'SELECT '.$date_from_gadd.' as fix_date, COUNT(*) as visits
+					FROM '._DB_PREFIX_.'connections c
+					WHERE c.date_add BETWEEN '.ModuleGraph::getDateBetween().'
+					'.Shop::addSqlRestriction(false, 'c').'
+					GROUP BY '.$date_from_gadd;
+			$visits = Db::getInstance()->query($sql);
+			while ($row = $db->nextRow($visits))
+				$visit_array[$row['fix_date']] = (int)$row['visits'];
+		}
 
 		foreach ($data_table as $row)
 		{
