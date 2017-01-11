@@ -51,7 +51,7 @@ class StatsForecast extends Module
 
 		$this->displayName = $this->l('Stats Dashboard');
 		$this->description = $this->l('This is the main module for the Stats dashboard. It displays a summary of all your current statistics.');
-		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.7.0.99');
 	}
 
 	public function install()
