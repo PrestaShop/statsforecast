@@ -163,8 +163,8 @@ class statsforecast extends Module
 				<thead>
 					<tr>
 						<th></th>
-						<th class="text-center"><span class="title_box active">'.$this->trans('Visits', array(), 'Admin.ShopParameters.Feature').'</span></th>
-						<th class="text-center"><span class="title_box active">'.$this->trans('Registrations', array(), 'Admin.ShopParameters.Feature').'</span></th>
+						<th class="text-center"><span class="title_box active">'.$this->trans('Visits', array(), 'Admin.Shopparameters.Feature').'</span></th>
+						<th class="text-center"><span class="title_box active">'.$this->trans('Registrations', array(), 'Admin.Shopparameters.Feature').'</span></th>
 						<th class="text-center"><span class="title_box active">'.$this->trans('Placed orders', array(), 'Modules.Statsforecast.Admin').'</span></th>
 						<th class="text-center"><span class="title_box active">'.$this->trans('Bought items', array(), 'Modules.Statsforecast.Admin').'</span></th>
 						<th class="text-center"><span class="title_box active">'.$this->trans('Percentage of registrations', array(), 'Modules.Statsforecast.Admin').'</span></th>
@@ -218,8 +218,8 @@ class statsforecast extends Module
         $this->html .= '
 				<tr>
 					<th></th>
-					<th class="text-center"><span class="title_box active">'.$this->trans('Visits', array(), 'Admin.ShopParameters.Feature').'</span></th>
-					<th class="text-center"><span class="title_box active">'.$this->trans('Registrations', array(), 'Admin.ShopParameters.Feature').'</span></th>
+					<th class="text-center"><span class="title_box active">'.$this->trans('Visits', array(), 'Admin.Shopparameters.Feature').'</span></th>
+					<th class="text-center"><span class="title_box active">'.$this->trans('Registrations', array(), 'Admin.Shopparameters.Feature').'</span></th>
 					<th class="text-center"><span class="title_box active">'.$this->trans('Placed orders', array(), 'Modules.Statsforecast.Admin').'</span></th>
 					<th class="text-center"><span class="title_box active">'.$this->trans('Bought items', array(), 'Modules.Statsforecast.Admin').'</span></th>
 					<th class="text-center"><span class="title_box active">'.$this->trans('Percentage of registrations', array(), 'Modules.Statsforecast.Admin').'</span></th>
@@ -306,7 +306,7 @@ class statsforecast extends Module
 				<tbody>
 					<tr>
 						<td rowspan="2" class="text-center">
-							<p>'.$this->trans('Visitors', array(), 'Admin.ShopParameters.Feature').'</p>
+							<p>'.$this->trans('Visitors', array(), 'Admin.Shopparameters.Feature').'</p>
 							<p>'.$visitors.'</p>
 						</td>
 						<td class="text-center">
@@ -349,7 +349,7 @@ class statsforecast extends Module
 							<p>'.$this->trans('Orders', array(), 'Admin.Global').'</p>
 						</td>
 						<td rowspan="2" class="text-center">
-							<p>'.$this->trans('Visitors', array(), 'Admin.ShopParameters.Feature').'</p>
+							<p>'.$this->trans('Visitors', array(), 'Admin.Shopparameters.Feature').'</p>
 						</td>
 						<td rowspan="2" class="text-center">
 							<i class="icon-chevron-right"></i>
@@ -471,7 +471,7 @@ class statsforecast extends Module
         foreach ($ca['cat'] as $catrow) {
             $this->html .= '
 						<tr>
-							<td class="text-center">'.(empty($catrow['name']) ? $this->trans('Unknown', array(), 'Admin.ShopParameters.Feature') : $catrow['name']).'</td>
+							<td class="text-center">'.(empty($catrow['name']) ? $this->trans('Unknown', array(), 'Admin.Shopparameters.Feature') : $catrow['name']).'</td>
 							<td class="text-center">'.$catrow['orderQty'].'</td>
 							<td class="text-right">'.Tools::displayPrice($catrow['orderSum'], $currency).'</td>
 							<td class="text-center">'.number_format((100 * $catrow['orderQty'] / $this->t4), 1, '.', ' ').'%</td>
@@ -526,7 +526,7 @@ class statsforecast extends Module
         foreach ($ca['zones'] as $zone) {
             $this->html .= '
 					<tr>
-						<td class="text-center">'.(isset($zone['name']) ? $zone['name'] : $this->trans('Undefined', array(), 'Admin.ShopParameters.Feature')).'</td>
+						<td class="text-center">'.(isset($zone['name']) ? $zone['name'] : $this->trans('Undefined', array(), 'Admin.Shopparameters.Feature')).'</td>
 						<td class="text-center">'.(int)($zone['nb']).'</td>
 						<td class="text-right">'.Tools::displayPrice($zone['total'], $currency).'</td>
 						<td class="text-center">'.($ca['ventil']['nb'] ? number_format((100 * $zone['nb'] / $ca['ventil']['nb']), 1, '.', ' ') : '0').'%</td>
