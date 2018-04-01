@@ -703,7 +703,7 @@ class statsforecast extends Module
 				ORDER BY total DESC';
         $ca['zones'] = Db::getInstance()->executeS($sql);
 
-        $sql = 'SELECT cu.name, SUM(o.total_paid_tax_excl / o.conversion_rate) as total, COUNT(*) as nb
+        $sql = 'SELECT cu.iso_code, SUM(o.total_paid_tax_excl / o.conversion_rate) as total, COUNT(*) as nb
 				FROM `'._DB_PREFIX_.'orders` o
 				LEFT JOIN `'._DB_PREFIX_.'currency` cu ON o.id_currency = cu.id_currency
 				'.$join.'
