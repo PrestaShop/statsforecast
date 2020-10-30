@@ -51,7 +51,7 @@ class statsforecast extends Module
         parent::__construct();
 
         $this->displayName = $this->trans('Stats Dashboard', array(), 'Modules.Statsforecast.Admin');
-        $this->description = $this->trans('This is the main module for the Stats dashboard. It displays a summary of all your current statistics.', array(), 'Modules.Statsforecast.Admin');
+        $this->description = $this->trans('Enrich your stats, add a summary of all your current statistics on your back office.', array(), 'Modules.Statsforecast.Admin');
         $this->ps_versions_compliancy = array('min' => '1.7.1.0', 'max' => _PS_VERSION_);
     }
 
