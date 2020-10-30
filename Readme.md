@@ -2,7 +2,7 @@
 
 ## About
 
-This is the main module for the Stats dashboard. It displays a summary of all your current statistics.
+Enrich your stats, add a summary of all your current statistics on your back office.
 
 ## Reporting issues
 
