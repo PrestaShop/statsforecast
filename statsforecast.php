@@ -619,7 +619,7 @@ class statsforecast extends Module
             $where = ' AND co.id_zone = '.(int)$this->context->cookie->stats_id_zone.' ';
         }
 
-        $sql = 'SELECT SUM(od.`product_price` * od.`product_quantity` / o.conversion_rate) as orderSum, SUM(od.product_quantity) as orderQty, cl.name, AVG(od.`product_price` / o.conversion_rate) as priveAvg
+        $sql = 'SELECT SUM(od.`unit_price_tax_excl` * od.`product_quantity` / o.conversion_rate) as orderSum, SUM(od.product_quantity) as orderQty, cl.name, AVG(od.`unit_price_tax_excl` / o.conversion_rate) as priveAvg
 				FROM `'._DB_PREFIX_.'orders` o
 				STRAIGHT_JOIN `'._DB_PREFIX_.'order_detail` od ON o.id_order = od.id_order
 				LEFT JOIN `'._DB_PREFIX_.'product` p ON p.id_product = od.product_id
