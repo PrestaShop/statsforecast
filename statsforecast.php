@@ -52,7 +52,7 @@ class statsforecast extends Module
 
         $this->displayName = $this->trans('Stats Dashboard', array(), 'Modules.Statsforecast.Admin');
         $this->description = $this->trans('Enrich your stats, add a summary of all your current statistics on your back office.', array(), 'Modules.Statsforecast.Admin');
-        $this->ps_versions_compliancy = array('min' => '1.7.1.0', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = array('min' => '1.7.6.0', 'max' => _PS_VERSION_);
     }
 
     public function install()
@@ -205,7 +205,7 @@ class statsforecast extends Module
 				<td class="text-center">'.(int)$row['countProducts'].'</td>
 				<td class="text-center">'.($visits_today ? round(100 * (int)$row['registrations'] / $visits_today, 2).' %' : '-').'</td>
 				<td class="text-center">'.($visits_today ? round(100 * (int)$row['countOrders'] / $visits_today, 2).' %' : '-').'</td>
-				<td class="text-right">'.Tools::displayPrice($row['totalSales'], $currency).'</td>
+				<td class="text-right">'.$this->context->getCurrentLocale()->formatPrice($row['totalSales'], $currency->iso_code).'</td>
 			</tr>';
 
             $this->t1 += $visits_today;
@@ -234,7 +234,7 @@ class statsforecast extends Module
 					<td class="text-center">'.(int)$this->t4.'</td>
 					<td class="text-center">--</td>
 					<td class="text-center">--</td>
-					<td class="text-right">'.Tools::displayPrice($this->t8, $currency).'</td>
+					<td class="text-right">'.$this->context->getCurrentLocale()->formatPrice($this->t8, $currency->iso_code).'</td>
 				</tr>
 				<tr>
 					<td>'.$this->trans('Average', array(), 'Modules.Statsforecast.Admin').'</td>
@@ -244,7 +244,7 @@ class statsforecast extends Module
 					<td class="text-center">'.(int)($this->t4 / $interval_avg).'</td>
 					<td class="text-center">'.($this->t1 ? round(100 * $this->t2 / $this->t1, 2).' %' : '-').'</td>
 					<td class="text-center">'.($this->t1 ? round(100 * $this->t3 / $this->t1, 2).' %' : '-').'</td>
-					<td class="text-right">'.Tools::displayPrice($this->t8 / $interval_avg, $currency).'</td>
+					<td class="text-right">'.$this->context->getCurrentLocale()->formatPrice($this->t8 / $interval_avg, $currency->iso_code).'</td>
 				</tr>
 				<tr>
 					<td>'.$this->trans('Forecast', array(), 'Modules.Statsforecast.Admin').'</td>
@@ -254,7 +254,7 @@ class statsforecast extends Module
 					<td class="text-center">'.(int)($this->t4 * $prop30).'</td>
 					<td class="text-center">--</td>
 					<td class="text-center">--</td>
-					<td class="text-right">'.Tools::displayPrice($this->t8 * $prop30, $currency).'</td>
+					<td class="text-right">'.$this->context->getCurrentLocale()->formatPrice($this->t8 * $prop30, $currency->iso_code).'</td>
 				</tr>
 			</table>
 		</div>';
@@ -383,8 +383,8 @@ class statsforecast extends Module
 		</div>
 		<div class="alert alert-info">
 			<p>'.$this->trans('A simple statistical calculation lets you know the monetary value of your visitors:', array(), 'Modules.Statsforecast.Admin').'</p>
-			<p>'.$this->trans('On average, each visitor places an order for this amount:', array(), 'Modules.Statsforecast.Admin').' <b>'.Tools::displayPrice($ca['ventil']['total'] / max(1, $visitors), $currency).'.</b></p>
-			<p>'.$this->trans('On average, each registered visitor places an order for this amount:', array(), 'Modules.Statsforecast.Admin').' <b>'.Tools::displayPrice($ca['ventil']['total'] / max(1, $customers), $currency).'</b>.</p>
+			<p>'.$this->trans('On average, each visitor places an order for this amount:', array(), 'Modules.Statsforecast.Admin').' <b>'.$this->context->getCurrentLocale()->formatPrice($ca['ventil']['total'] / max(1, $visitors), $currency->iso_code).'.</b></p>
+			<p>'.$this->trans('On average, each registered visitor places an order for this amount:', array(), 'Modules.Statsforecast.Admin').' <b>'.$this->context->getCurrentLocale()->formatPrice($ca['ventil']['total'] / max(1, $customers), $currency->iso_code).'</b>.</p>
 		</div>';
 
         $from = strtotime($employee->stats_date_from.' 00:00:00');
@@ -429,8 +429,8 @@ class statsforecast extends Module
 						<tr>
 							<td class="text-center">'.$payment['payment_method'].'</td>
 							<td class="text-center">'.(int)$payment['nb'].'</td>
-							<td class="text-right">'.Tools::displayPrice($payment['total'], $currency).'</td>
-							<td class="text-right">'.Tools::displayPrice($payment['total'] / (int)$payment['nb'], $currency).'</td>
+							<td class="text-right">'.$this->context->getCurrentLocale()->formatPrice($payment['total'], $currency->iso_code).'</td>
+							<td class="text-right">'.$this->context->getCurrentLocale()->formatPrice($payment['total'] / (int)$payment['nb'], $currency->iso_code).'</td>
 						</tr>';
         }
         $this->html .= '
@@ -473,10 +473,10 @@ class statsforecast extends Module
 						<tr>
 							<td class="text-center">'.(empty($catrow['name']) ? $this->trans('Unknown', array(), 'Admin.Shopparameters.Feature') : $catrow['name']).'</td>
 							<td class="text-center">'.$catrow['orderQty'].'</td>
-							<td class="text-right">'.Tools::displayPrice($catrow['orderSum'], $currency).'</td>
+							<td class="text-right">'.$this->context->getCurrentLocale()->formatPrice($catrow['orderSum'], $currency->iso_code).'</td>
 							<td class="text-center">'.number_format((100 * $catrow['orderQty'] / $this->t4), 1, '.', ' ').'%</td>
 							<td class="text-center">'.((int)$ca['ventil']['total'] ? number_format((100 * $catrow['orderSum'] / $ca['ventil']['total']), 1, '.', ' ') : '0').'%</td>
-							<td class="text-right">'.Tools::displayPrice($catrow['priveAvg'], $currency).'</td>
+							<td class="text-right">'.$this->context->getCurrentLocale()->formatPrice($catrow['priveAvg'], $currency->iso_code).'</td>
 						</tr>';
         }
         $this->html .= '
@@ -500,7 +500,7 @@ class statsforecast extends Module
             $this->html .= '
 					<tr '.(($percent < 0) ? 'class="alt_row"' : '').'>
 						<td class="text-center">'.$ophone.'</td>
-						<td class="text-right">'.Tools::displayPrice($amount, $currency).'</td>
+						<td class="text-right">'.$this->context->getCurrentLocale()->formatPrice($amount, $currency->iso_code).'</td>
 						<td class="text-center">'.((int)$ca['ventil']['total'] ? number_format((100 * $amount / $ca['ventil']['total']), 1, '.', ' ').'%' : '-').'</td>
 						<td class="text-center">'.(($percent > 0 || $percent == '&#x221e;') ? '<img src="../img/admin/arrow_up.png" alt="" />' : '<img src="../img/admin/arrow_down.png" alt="" /> ').'</td>
 						<td class="text-center">'.(($percent > 0 || $percent == '&#x221e;') ? '+' : '').$percent.'%</td>
@@ -528,7 +528,7 @@ class statsforecast extends Module
 					<tr>
 						<td class="text-center">'.(isset($zone['name']) ? $zone['name'] : $this->trans('Undefined', array(), 'Admin.Shopparameters.Feature')).'</td>
 						<td class="text-center">'.(int)($zone['nb']).'</td>
-						<td class="text-right">'.Tools::displayPrice($zone['total'], $currency).'</td>
+						<td class="text-right">'.$this->context->getCurrentLocale()->formatPrice($zone['total'], $currency->iso_code).'</td>
 						<td class="text-center">'.($ca['ventil']['nb'] ? number_format((100 * $zone['nb'] / $ca['ventil']['nb']), 1, '.', ' ') : '0').'%</td>
 						<td class="text-center">'.((int)$ca['ventil']['total'] ? number_format((100 * $zone['total'] / $ca['ventil']['total']), 1, '.', ' ') : '0').'%</td>
 					</tr>';
@@ -572,7 +572,7 @@ class statsforecast extends Module
 						<tr>
 							<td class="text-center">'.$currency_row['name'].'</td>
 							<td class="text-center">'.(int)($currency_row['nb']).'</td>
-							<td class="text-right">'.Tools::displayPrice($currency_row['total'], $currency).'</td>
+							<td class="text-right">'.$this->context->getCurrentLocale()->formatPrice($currency_row['total'], $currency->iso_code).'</td>
 							<td class="text-center">'.($ca['ventil']['nb'] ? number_format((100 * $currency_row['nb'] / $ca['ventil']['nb']), 1, '.', ' ') : '0').'%</td>
 							<td class="text-center">'.((int)$ca['ventil']['total'] ? number_format((100 * $currency_row['total'] / $ca['ventil']['total']), 1, '.', ' ') : '0').'%</td>
 						</tr>';
