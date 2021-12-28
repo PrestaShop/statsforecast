@@ -57,7 +57,7 @@ class statsforecast extends Module
 
     public function install()
     {
-        return (parent::install() && $this->registerHook('AdminStatsModules'));
+        return (parent::install() && $this->registerHook('displayAdminStatsModules'));
     }
 
     public function getContent()
@@ -65,7 +65,7 @@ class statsforecast extends Module
         Tools::redirectAdmin('index.php?controller=AdminStats&module=statsforecast&token='.Tools::getAdminTokenLite('AdminStats'));
     }
 
-    public function hookAdminStatsModules()
+    public function hookDisplayAdminStatsModules()
     {
         $ru = AdminController::$currentIndex.'&module='.$this->name.'&token='.Tools::getValue('token');
 
