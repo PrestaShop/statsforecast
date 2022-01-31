@@ -276,14 +276,14 @@ class statsforecast extends Module
         $customers = Db::getInstance()->getValue($sql);
 
         $sql = 'SELECT COUNT(DISTINCT c.id_cart)
-		FROM '._DB_PREFIX_.'cart c 
+		FROM '._DB_PREFIX_.'cart c
 		INNER JOIN '._DB_PREFIX_.'cart_product cp on c.id_cart = cp.id_cart
 		WHERE (c.date_add BETWEEN '.ModuleGraph::getDateBetween().' OR c.date_upd BETWEEN '.ModuleGraph::getDateBetween().')
 		'.Shop::addSqlRestriction(false, 'c');
         $carts = Db::getInstance()->getValue($sql);
 
         $sql = 'SELECT COUNT(DISTINCT c.id_cart)
-		FROM '._DB_PREFIX_.'cart c 
+		FROM '._DB_PREFIX_.'cart c
 		INNER JOIN '._DB_PREFIX_.'cart_product cp on c.id_cart = cp.id_cart
 		WHERE (c.date_add BETWEEN '.ModuleGraph::getDateBetween().' OR c.date_upd BETWEEN '.ModuleGraph::getDateBetween().')
 		AND id_address_invoice != 0
@@ -496,12 +496,12 @@ class statsforecast extends Module
 					</thead>
 					<tbody>';
         foreach ($ca['lang'] as $ophone => $amount) {
-            $percent = (int)($ca['langprev'][$ophone]) ? number_format((100 * $amount / $ca['langprev'][$ophone]) - 100, 1, '.', ' ') : '&#x221e;';
+            $percent = (int)($ca['langprev'][$ophone]) ? number_format((100 * (int) $amount / $ca['langprev'][$ophone]) - 100, 1, '.', ' ') : '&#x221e;';
             $this->html .= '
 					<tr '.(($percent < 0) ? 'class="alt_row"' : '').'>
 						<td class="text-center">'.$ophone.'</td>
-						<td class="text-right">'.$this->context->getCurrentLocale()->formatPrice($amount, $currency->iso_code).'</td>
-						<td class="text-center">'.((int)$ca['ventil']['total'] ? number_format((100 * $amount / $ca['ventil']['total']), 1, '.', ' ').'%' : '-').'</td>
+						<td class="text-right">'.$this->context->getCurrentLocale()->formatPrice((int) $amount, $currency->iso_code).'</td>
+						<td class="text-center">'.((int)$ca['ventil']['total'] ? number_format((100 * (int) $amount / $ca['ventil']['total']), 1, '.', ' ').'%' : '-').'</td>
 						<td class="text-center">'.(($percent > 0 || $percent == '&#x221e;') ? '<img src="../img/admin/arrow_up.png" alt="" />' : '<img src="../img/admin/arrow_down.png" alt="" /> ').'</td>
 						<td class="text-center">'.(($percent > 0 || $percent == '&#x221e;') ? '+' : '').$percent.'%</td>
 					</tr>';
