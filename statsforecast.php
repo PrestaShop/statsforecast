@@ -729,7 +729,7 @@ class statsforecast extends Module
 					' . Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o');
         $ca['ventil'] = Db::getInstance()->getRow($sql);
 
-        $sql = 'SELECT /*pac.id_attribute,*/ agl.name as gname, al.name as aname, COUNT(*) as total
+        $sql = 'SELECT /*pac.id_attribute,*/ agl.name as gname, al.name as aname, SUM(od.product_quantity) as total
 				FROM ' . _DB_PREFIX_ . 'orders o
 				LEFT JOIN ' . _DB_PREFIX_ . 'order_detail od ON o.id_order = od.id_order
 				INNER JOIN ' . _DB_PREFIX_ . 'product_attribute_combination pac ON od.product_attribute_id = pac.id_product_attribute
