@@ -14,7 +14,7 @@ Link to specs : https://docs.prestashop-project.org/functional-documentation/fun
 
 Link to test scenario : https://build.prestashop-project.org/test-scenarios/scenarios/modules/statsforecast.html
 
-If the module is enabled ,check that the statistical information are existing in the Stats page. 
+If the module is enabled, check that the statistical information are existing in the Stats page. 
 
 ## Reporting issues
 
