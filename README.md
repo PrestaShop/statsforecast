@@ -8,6 +8,14 @@ Enrich your stats, add a summary of all your current statistics on your back off
 
 PrestaShop: `1.7.6.0` or later
 
+## How to test
+
+Link to specs : https://docs.prestashop-project.org/functional-documentation/functional-documentation/ux-ui/back-office/improve/modules/stats-dashboard-statsforecast
+
+Link to test scenario : https://build.prestashop-project.org/test-scenarios/scenarios/modules/statsforecast.html
+
+If the module is enabled, check that the statistical information are existing in the Stats page. 
+
 ## Reporting issues
 
 You can report issues with this module in the main PrestaShop repository. [Click here to report an issue][report-issue]. 
