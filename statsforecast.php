@@ -61,12 +61,12 @@ class statsforecast extends Module
 
     public function getContent()
     {
-        Tools::redirectAdmin('index.php?controller=AdminStats&module=statsforecast&token=' . Tools::getAdminTokenLite('AdminStats'));
+        Tools::redirectAdmin($this->context->link->getAdminLink('AdminStats', true) . '&module=' . $this->name);
     }
 
     public function hookDisplayAdminStatsModules()
     {
-        $ru = AdminController::$currentIndex . '&module=' . $this->name . '&token=' . Tools::getValue('token');
+        $ru = $this->context->link->getAdminLink('AdminStats', true) . '&module=' . $this->name;
 
         $db = Db::getInstance();
 
