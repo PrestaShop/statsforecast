@@ -10,9 +10,9 @@ PrestaShop: `1.7.6.0` or later
 
 ## How to test
 
-Link to specs : https://docs.prestashop-project.org/functional-documentation/functional-documentation/ux-ui/back-office/improve/modules/stats-dashboard-statsforecast
+Link to specs: https://docs.prestashop-project.org/functional-documentation/functional-documentation/ux-ui/back-office/improve/modules/stats-dashboard-statsforecast
 
-Link to test scenario : https://build.prestashop-project.org/test-scenarios/scenarios/modules/statsforecast.html
+Link to test scenario: https://build.prestashop-project.org/test-scenarios/scenarios/modules/statsforecast.html
 
 If the module is enabled, check that the statistical information are existing in the Stats page. 
 
