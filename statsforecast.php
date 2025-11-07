@@ -61,12 +61,12 @@ class statsforecast extends Module
 
     public function getContent()
     {
-        Tools::redirectAdmin($this->context->link->getAdminLink('AdminStats', true) . '&module=' . $this->name);
+        Tools::redirectAdmin($this->context->link->getAdminLink('AdminStats', true, [], ['module' => $this->name]));
     }
 
     public function hookDisplayAdminStatsModules()
     {
-        $ru = $this->context->link->getAdminLink('AdminStats', true) . '&module=' . $this->name;
+        $ru = $this->context->link->getAdminLink('AdminStats', true, [], ['module' => $this->name]);
 
         $db = Db::getInstance();
 
