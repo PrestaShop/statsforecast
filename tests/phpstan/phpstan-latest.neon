@@ -1,0 +1,7 @@
+includes:
+	- %currentWorkingDirectory%/tests/phpstan/phpstan.neon
+
+parameters:
+  ignoreErrors:
+    - '#Access to an undefined property Cookie::\$stats_granularity.#'
+    - '#Access to an undefined property Cookie::\$stats_id_zone.#'
