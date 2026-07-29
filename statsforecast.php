@@ -39,6 +39,43 @@ class statsforecast extends Module
     private $t7 = 0;
     private $t8 = 0;
 
+    /**
+     * The date a statistic counts an order at.
+     *
+     * An order only receives an invoice date when its status issues invoices. Without one the column
+     * keeps the zero date, which falls outside every range, so the order was counted by nothing.
+     *
+     * @param string $alias
+     *
+     * @return string
+     */
+    protected static function getCountedAtSql($alias = 'o')
+    {
+        $prefix = $alias ? '`' . bqSQL($alias) . '`.' : '';
+
+        return '(CASE WHEN ' . $prefix . '`invoice_date` > "1000-01-01 00:00:00"
+            THEN ' . $prefix . '`invoice_date` ELSE ' . $prefix . '`date_add` END)';
+    }
+
+    /**
+     * Restricts a statistic to the orders counted inside the given range.
+     *
+     * Kept as two comparisons rather than a condition on getCountedAtSql(): both columns are indexed
+     * and a CASE around them would not be.
+     *
+     * @param string $between The "'from' AND 'to'" pair returned by ModuleGraph::getDateBetween()
+     * @param string $alias
+     *
+     * @return string
+     */
+    protected static function getCountedBetweenSql($between, $alias = 'o')
+    {
+        $prefix = $alias ? '`' . bqSQL($alias) . '`.' : '';
+
+        return '(' . $prefix . '`invoice_date` BETWEEN ' . $between
+            . ' OR (' . $prefix . '`invoice_date` <= "1000-01-01 00:00:00" AND ' . $prefix . '`date_add` BETWEEN ' . $between . '))';
+    }
+
     public function __construct()
     {
         $this->name = 'statsforecast';
@@ -128,8 +165,8 @@ class statsforecast extends Module
             : 'IFNULL(MAKEDATE(YEAR(date_add),DAYOFYEAR(date_add)-WEEKDAY(date_add)), CONCAT(YEAR(date_add),"-01-01*"))');
 
         $date_from_ginvoice = ($this->context->cookie->stats_granularity != 42
-            ? 'LEFT(invoice_date, ' . (int) $this->context->cookie->stats_granularity . ')'
-            : 'IFNULL(MAKEDATE(YEAR(invoice_date),DAYOFYEAR(invoice_date)-WEEKDAY(invoice_date)), CONCAT(YEAR(invoice_date),"-01-01*"))');
+            ? 'LEFT(' . self::getCountedAtSql('') . ', ' . (int) $this->context->cookie->stats_granularity . ')'
+            : 'IFNULL(MAKEDATE(YEAR(' . self::getCountedAtSql('') . '),DAYOFYEAR(' . self::getCountedAtSql('') . ')-WEEKDAY(' . self::getCountedAtSql('') . ')), CONCAT(YEAR(' . self::getCountedAtSql('') . '),"-01-01*"))');
 
         $result = $db->query('
 		SELECT
@@ -139,7 +176,7 @@ class statsforecast extends Module
 			SUM(o.total_paid_tax_excl / o.conversion_rate) as totalSales
 		FROM ' . _DB_PREFIX_ . 'orders o
 		WHERE o.valid = 1
-		AND o.invoice_date BETWEEN ' . ModuleGraph::getDateBetween() . '
+		AND ' . self::getCountedBetweenSql(ModuleGraph::getDateBetween()) . '
 		' . Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o') . '
 		GROUP BY ' . $date_from_ginvoice);
         while ($row = $db->nextRow($result)) {
@@ -634,7 +671,7 @@ class statsforecast extends Module
 				LEFT JOIN `' . _DB_PREFIX_ . 'category_lang` cl ON (product_shop.id_category_default = cl.id_category AND cl.id_lang = ' . (int) $this->context->language->id . Shop::addSqlRestrictionOnLang('cl') . ')
 				' . $join . '
 				WHERE o.valid = 1
-					AND o.`invoice_date` BETWEEN ' . ModuleGraph::getDateBetween() . '
+					AND ' . self::getCountedBetweenSql(ModuleGraph::getDateBetween()) . '
 					' . $where . '
 					' . Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o') . '
 				GROUP BY product_shop.id_category_default';
@@ -656,7 +693,7 @@ class statsforecast extends Module
             $sql = 'SELECT ' . $lang_values . '
 					FROM `' . _DB_PREFIX_ . 'orders` o
 					WHERE o.valid = 1
-					AND o.`invoice_date` BETWEEN ' . ModuleGraph::getDateBetween() . '
+					AND ' . self::getCountedBetweenSql(ModuleGraph::getDateBetween()) . '
 					' . Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o');
             $ca['lang'] = Db::getInstance()->getRow($sql);
             arsort($ca['lang']);
@@ -664,7 +701,7 @@ class statsforecast extends Module
             $sql = 'SELECT ' . $lang_values . '
 					FROM `' . _DB_PREFIX_ . 'orders` o
 					WHERE o.valid = 1
-						AND ADDDATE(o.`invoice_date`, interval 30 day) BETWEEN \'' . $employee->stats_date_from . ' 00:00:00\' AND \'' . min(date('Y-m-d H:i:s'), $employee->stats_date_to . ' 23:59:59') . '\'
+						AND ADDDATE(' . self::getCountedAtSql() . ', interval 30 day) BETWEEN \'' . $employee->stats_date_from . ' 00:00:00\' AND \'' . min(date('Y-m-d H:i:s'), $employee->stats_date_to . ' 23:59:59') . '\'
 						' . Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o');
             $ca['langprev'] = Db::getInstance()->getRow($sql);
         } else {
@@ -678,7 +715,7 @@ class statsforecast extends Module
 					WHERE o.valid
 					' . $where . '
 					' . Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o') . '
-					AND o.invoice_date BETWEEN ' . ModuleGraph::getDateBetween() . '';
+					AND ' . self::getCountedBetweenSql(ModuleGraph::getDateBetween()) . '';
         $result = Db::getInstance()->executeS($sql);
         if (count($result)) {
             $references = [];
@@ -704,7 +741,7 @@ class statsforecast extends Module
 				LEFT JOIN `' . _DB_PREFIX_ . 'country` c ON c.id_country = a.id_country
 				LEFT JOIN `' . _DB_PREFIX_ . 'zone` z ON z.id_zone = c.id_zone
 				WHERE o.valid = 1
-					AND o.`invoice_date` BETWEEN ' . ModuleGraph::getDateBetween() . '
+					AND ' . self::getCountedBetweenSql(ModuleGraph::getDateBetween()) . '
 					' . Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o') . '
 				GROUP BY c.id_zone
 				ORDER BY total DESC';
@@ -715,7 +752,7 @@ class statsforecast extends Module
 				LEFT JOIN `' . _DB_PREFIX_ . 'currency` cu ON o.id_currency = cu.id_currency
 				' . $join . '
 				WHERE o.valid = 1
-					AND o.`invoice_date` BETWEEN ' . ModuleGraph::getDateBetween() . '
+					AND ' . self::getCountedBetweenSql(ModuleGraph::getDateBetween()) . '
 					' . $where . '
 					' . Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o') . '
 				GROUP BY o.id_currency
@@ -725,7 +762,7 @@ class statsforecast extends Module
         $sql = 'SELECT SUM(total_paid_tax_excl / o.conversion_rate) as total, COUNT(*) AS nb
 				FROM `' . _DB_PREFIX_ . 'orders` o
 				WHERE o.valid = 1
-					AND o.`invoice_date` BETWEEN ' . ModuleGraph::getDateBetween() . '
+					AND ' . self::getCountedBetweenSql(ModuleGraph::getDateBetween()) . '
 					' . Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o');
         $ca['ventil'] = Db::getInstance()->getRow($sql);
 
@@ -737,7 +774,7 @@ class statsforecast extends Module
 				INNER JOIN ' . _DB_PREFIX_ . 'attribute_group_lang agl ON (a.id_attribute_group = agl.id_attribute_group AND agl.id_lang = ' . (int) $this->context->language->id . ')
 				INNER JOIN ' . _DB_PREFIX_ . 'attribute_lang al ON (a.id_attribute = al.id_attribute AND al.id_lang = ' . (int) $this->context->language->id . ')
 				WHERE o.valid = 1
-					AND o.`invoice_date` BETWEEN ' . ModuleGraph::getDateBetween() . '
+					AND ' . self::getCountedBetweenSql(ModuleGraph::getDateBetween()) . '
 					' . Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o') . '
 				GROUP BY pac.id_attribute';
         $ca['attributes'] = Db::getInstance()->executeS($sql);
