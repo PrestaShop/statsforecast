@@ -97,19 +97,7 @@ class statsforecast extends Module
         $interval2 = ($to2 - $from) / 60 / 60 / 24;
         $prop30 = $interval / $interval2;
 
-        $interval_avg = 1;
-        if ($this->context->cookie->stats_granularity == 7) {
-            $interval_avg = $interval2 / 30;
-        }
-        if ($this->context->cookie->stats_granularity == 4) {
-            $interval_avg = $interval2 / 365;
-        }
-        if ($this->context->cookie->stats_granularity == 10) {
-            $interval_avg = $interval2;
-        }
-        if ($this->context->cookie->stats_granularity == 42) {
-            $interval_avg = $interval2 / 7;
-        }
+        $interval_avg = $this->countElapsedPeriods($from, $to2, (int) $this->context->cookie->stats_granularity);
 
         $data_table = [];
         if ($this->context->cookie->stats_granularity == 10) {
@@ -613,6 +601,65 @@ class statsforecast extends Module
 			</div>';
 
         return $this->html;
+    }
+
+    /**
+     * Counts the calendar periods that have actually elapsed inside the selected range, grouped
+     * exactly like the rows of the table.
+     *
+     * WHY: the average used to divide by $interval2, an elapsed duration in days that is almost
+     * always fractional because it ends at the current time of day, while the table sums whole
+     * periods. Dividing a whole-period total by a fraction of a period overstates the average - a
+     * single day range reported twice the value of the one row it displayed. Counting the periods
+     * makes the average row the mean of the rows above it.
+     *
+     * @param int $from start of the selected range
+     * @param int $to2 end of the selected range, never later than now
+     * @param int $granularity one of the stats_granularity values
+     *
+     * @return int at least 1, so a range that has not started yet cannot divide by zero
+     */
+    private function countElapsedPeriods($from, $to2, $granularity)
+    {
+        $periods = [];
+        for ($i = $from; $i <= $to2; $i = strtotime('+1 day', $i)) {
+            $periods[$this->getPeriodKey($i, $granularity)] = true;
+        }
+
+        return max(1, count($periods));
+    }
+
+    /**
+     * Builds the period a day belongs to, mirroring the GROUP BY of the queries above so the
+     * divisor and the rows always agree.
+     *
+     * @param int $timestamp
+     * @param int $granularity
+     *
+     * @return string
+     */
+    private function getPeriodKey($timestamp, $granularity)
+    {
+        if ($granularity == 42) {
+            // Mirrors MAKEDATE(YEAR(d), DAYOFYEAR(d) - WEEKDAY(d)), including the fallback MySQL
+            // uses when that offset lands before January 1st. WEEKDAY() counts Monday as 0.
+            $offset = ((int) date('z', $timestamp) + 1) - ((int) date('N', $timestamp) - 1);
+            if ($offset <= 0) {
+                return date('Y', $timestamp) . '-01-01*';
+            }
+
+            return date('Y-m-d', mktime(0, 0, 0, 1, $offset, (int) date('Y', $timestamp)));
+        }
+
+        if ($granularity == 7) {
+            return date('Y-m', $timestamp);
+        }
+
+        if ($granularity == 4) {
+            return date('Y', $timestamp);
+        }
+
+        return date('Y-m-d', $timestamp);
     }
 
     private function getRealCA()
